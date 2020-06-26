@@ -129,7 +129,7 @@ class Main extends React.Component {
 
     playButton = () => {
         clearInterval(this.intervalId);
-        this.intervalId = setInterval(this.play, this.props.speed);
+        this.intervalId = setInterval(this.play, this.speed);
     }
 
     pauseButton = () => {
@@ -198,7 +198,8 @@ class Main extends React.Component {
     }
 
     componentDidMount() {
-      this.seed();  
+      this.seed();
+      this.playButton();  
     }
 
     render() {
