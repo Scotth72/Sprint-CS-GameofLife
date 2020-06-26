@@ -1,14 +1,15 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 class Box extends React.Component {
     selectBox = () => {
-       this.props.selectBox(this.props.row, this.props.col) 
+      this.props.selectBox(this.props.row, this.props.col) 
     }
+
     render() {
 
         return (
-            <div className={this.props.boxClass}
+            <div 
+            className={this.props.boxClass}
             id={this.props.id}
             onClick={this.selectBox}
             />
@@ -26,7 +27,7 @@ class Grid extends React.Component {
              for (let j = 0; j < this.props.cols; j++) {
                let boxId = i + "_" + j;
                
-               boxClass = this.props.gridFull[i] [j] ? "box on" : "box off";
+               boxClass = this.props.gridFull[i][j] ? "box on" : "box off";
                rowsArr.push(
                    <Box 
                      boxClass = {boxClass}
@@ -60,6 +61,37 @@ class Main extends React.Component {
             gridFull: Array(this.rows).fill().map(() => Array(this.cols).fill(false))
         }
     }
+
+    selectBox = (row, col) => {
+        let gridCopy = arrayClone(this.state.gridFull);
+        gridCopy[row][col] = !gridCopy[row][col];
+        this.setState({
+          gridFull: gridCopy
+        })
+    }
+
+    seed = () => {
+        let gridCopy = arrayClone(this.state.gridFull);
+        for (let i = 0; i < this.rows; i++) {
+          for (let j = 0; j < this.cols; j++) {
+            if (Math.floor(Math.random() * 4) === 1){
+               gridCopy[i][j] = true; 
+            }  
+          }
+        }
+        this.setState({
+            gridFull: gridCopy
+        })
+    }
+
+    playButton = () => {
+        this.intervalId = setInterval(this.play, this.props.speed);
+    }
+
+    componentDidMount() {
+      this.seed();  
+    }
+
     render() {
         return (
             <div>
@@ -74,6 +106,10 @@ class Main extends React.Component {
             </div>
         )
     }
+}
+
+function arrayClone(arr) {
+    return JSON.parse(JSON.stringify(arr))
 }
 
 export default Main;
