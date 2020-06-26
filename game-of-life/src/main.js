@@ -1,4 +1,7 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
+import { ButtonGroup, MenuItem, DropdownButton, Button} from 'react-bootstrap';
+
 
 class Box extends React.Component {
     selectBox = () => {
@@ -19,7 +22,7 @@ class Box extends React.Component {
 
 class Grid extends React.Component {
     render() {
-        const width = (this.props.cols * 16) +1;
+        const width = (this.props.cols * 14);
         let rowsArr = []
 
         let boxClass = "";
@@ -35,7 +38,7 @@ class Grid extends React.Component {
                      boxId = {boxId}
                      row = {i}
                      cols = {j}
-                     selected={this.props.selectBox}
+                     selectBox={this.props.selectBox}
                      />
                );
              }
@@ -44,6 +47,22 @@ class Grid extends React.Component {
             <div className="grid" style={{width: width}}>
                 {rowsArr}
                 
+            </div>
+        )
+    }
+}
+
+class Buttons extends React.Component {
+
+    render() {
+        return (
+            <div className="center">
+                <ButtonGroup>
+                    <Button className="btn btn-default" onClick={this.props.playButton}>
+                        Play
+                    </Button>
+                </ButtonGroup>
+
             </div>
         )
     }
@@ -85,7 +104,73 @@ class Main extends React.Component {
     }
 
     playButton = () => {
+        clearInterval(this.intervalId);
         this.intervalId = setInterval(this.play, this.props.speed);
+    }
+
+    pauseButton = () => {
+        clearInterval(this.intervalId);
+    }
+
+    slow = () => {
+        this.speed = 1000;
+        this.playButton();
+    }
+
+    fast = () => {
+        this.speed = 100;
+        this.playButton();
+    }
+
+    clear = () => {
+        let grid = Array(this.rows).fill().map(() => Array(this.cols).fill(false));
+        this.setState({
+            gridFull: grid,
+            generation: 0
+        });
+    }
+
+    gridSize = (size) => {
+        switch (size) {
+            case "1":
+                this.cols = 20;
+                this.rows = 10;
+            break;
+            case "2":
+                this.cols = 50;
+                this.rows = 30;
+            break;
+            default:
+                this.cols = 70;
+                this.rows = 50;        
+        }
+        this.clear();
+    }
+
+        play = () => {
+        let g = this.state.gridFull;
+        let g2 = arrayClone(this.state.gridFull);
+
+        for (let i = 0; i < this.rows; i++) {
+          for (let j = 0; j < this.cols; j++) {
+            let count = 0;
+            if (i > 0) if (g[i - 1][j]) count++;
+            if (i > 0 && j > 0) if (g[i - 1][j - 1]) count++;
+            if (i > 0 && j < this.cols - 1) if (g[i - 1][j + 1]) count++;
+            if (j < this.cols - 1) if (g[i][j + 1]) count++;
+            if (j > 0) if (g[i][j - 1]) count++;
+            if (i < this.rows - 1) if (g[i + 1][j]) count++;
+            if (i < this.rows - 1 && j > 0) if (g[i + 1][j - 1]) count++;
+            if (i < this.rows - 1 && j < this.cols - 1) if (g[i + 1][j + 1]) count++;
+            if (g[i][j] && (count < 2 || count > 3)) g2[i][j] = false;
+            if (!g[i][j] && count === 3) g2[i][j] = true;
+          }
+        }
+        this.setState({
+          gridFull: g2,
+          generation: this.state.generation + 1
+        });
+
     }
 
     componentDidMount() {
@@ -96,6 +181,9 @@ class Main extends React.Component {
         return (
             <div>
                 <h1>The Game of Life</h1>
+                <Buttons
+                    playButton={this.playButton}
+                />    
                 <Grid
                   gridFull={this.state.gridFull}
                   rows={this.rows}
