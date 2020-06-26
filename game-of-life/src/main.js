@@ -61,6 +61,9 @@ class Buttons extends React.Component {
                     <Button className="btn btn-default" onClick={this.props.playButton}>
                         Play
                     </Button>
+                    <Button className="btn btn-default" onClick={this.props.pauseButton}>
+                        Pause
+                    </Button>
                 </ButtonGroup>
 
             </div>
@@ -183,6 +186,7 @@ class Main extends React.Component {
                 <h1>The Game of Life</h1>
                 <Buttons
                     playButton={this.playButton}
+                    pauseButton={this.pauseButton}
                 />    
                 <Grid
                   gridFull={this.state.gridFull}
