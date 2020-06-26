@@ -1,4 +1,6 @@
 import React from 'react';
+import {ButtonToolbar, Dropdown, DropdownButton, ButtonGroup, Button } from 'react-bootstrap';
+
 
 class Box extends React.Component {
     selectBox = () => {
@@ -19,7 +21,7 @@ class Box extends React.Component {
 
 class Grid extends React.Component {
     render() {
-        const width = (this.props.cols * 16) +1;
+        const width = (this.props.cols * 14) +1;
         let rowsArr = []
 
         let boxClass = "";
@@ -44,6 +46,55 @@ class Grid extends React.Component {
             <div className="grid" style={{width: width}}>
                 {rowsArr}
                 
+            </div>
+        )
+    }
+}
+
+class Buttons extends React.Component {
+
+    handleSelect = (evt) => {
+        this.props.gridSize(evt);
+    }
+
+    render() {
+        return (
+            <div className="center">
+                <ButtonToolbar>
+                    <ButtonGroup>
+                    <Button className="btn btn-default"
+                    onClick={this.props.playButton}>
+                    Play
+                    </Button>
+                    <Button className="btn btn-default"
+                    onClick={this.props.pauseButton}>
+                    Pause
+                    </Button>
+                    <Button className="btn btn-default"
+                    onClick={this.props.clea}>
+                    Clear
+                    </Button>
+                    <Button className="btn btn-default"
+                    onClick={this.props.slow}>
+                    Slow
+                    </Button>
+                    <Button className="btn btn-default"
+                    onClick={this.props.fast}>
+                    Fast
+                    </Button>
+                    <Button className="btn btn-default"
+                    onClick={this.props.seed}>
+                    Seed
+                    </Button>
+                    <DropdownButton id="size-menu" title="Grid Size">
+                        <Dropdown.Item as="button">20X10</Dropdown.Item>
+                        <Dropdown.Item as="button">50X30</Dropdown.Item>
+                        <Dropdown.Item as="button">70X50</Dropdown.Item>
+                    </DropdownButton>
+                    </ButtonGroup>
+                    </ButtonToolbar>
+                    
+
             </div>
         )
     }
@@ -85,17 +136,57 @@ class Main extends React.Component {
     }
 
     playButton = () => {
+        clearInterval(this.intervalId)
         this.intervalId = setInterval(this.play, this.props.speed);
     }
 
+    pauseButton = () => {
+        clearInterval(this.intervalId);
+    }
+
+    play = () => {
+        let g = this.state.gridFull;
+        let g2 = arrayClone(this.state.gridFull);
+
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                let count = 0;
+                if (i > 0) if (g[i-1][j]) count ++;
+                if (i > 0 && j > 0) if (g[i - 1][j - 1]) count++;
+                if (i > 0 && j < this.cols - 1) if (g[i - 1][j - 1]) count++;
+                if (j < this.cols - 1) if (g[i][j + 1]) count++;
+                if (j > 0) if (g[i][j - 1]) count++;
+                if (i < this.rows -1) if (g[i +1][j]) count++;
+                if (i < this.rows -1 && j > 0) if (g[i + 1][j - 1]) count++;
+                if (i < this.rows -1 && this.cols -1) if (g[i + 1][j +1]) count++;
+                if (g[i][j] && (count < 2 || count > 3)) g2[i][j] = false;
+                if(!g[i][j] && count === 3) g2[i][j] = true;
+            }
+        }
+        this.setState({
+            gridFull: g2,
+            generation: this.state.generation + 1
+        });
+    }
+
     componentDidMount() {
-      this.seed();  
+      this.seed(); 
+      this.playButton(); 
     }
 
     render() {
         return (
             <div>
                 <h1>The Game of Life</h1>
+                <Buttons
+        playButton={this.playButton}
+        pauseButton={this.pauseButton}
+        slow={this.slow}
+        fast={this.fast}
+        clear={this.clear}
+        seed={this.seed}
+        gridSize={this.gridSize}
+        />
                 <Grid
                   gridFull={this.state.gridFull}
                   rows={this.rows}
