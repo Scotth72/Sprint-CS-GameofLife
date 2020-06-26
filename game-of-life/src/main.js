@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ButtonGroup, MenuItem, DropdownButton, Button} from 'react-bootstrap';
+import { ButtonGroup, Dropdown, DropdownButton, Button} from 'react-bootstrap';
 
 
 class Box extends React.Component {
@@ -21,6 +21,7 @@ class Box extends React.Component {
 }
 
 class Grid extends React.Component {
+
     render() {
         const width = (this.props.cols * 14);
         let rowsArr = []
@@ -53,7 +54,9 @@ class Grid extends React.Component {
 }
 
 class Buttons extends React.Component {
-
+    handleSelect = (evt) => {
+        this.props.gridSize(evt);
+    }
     render() {
         return (
             <div className="center">
@@ -64,6 +67,24 @@ class Buttons extends React.Component {
                     <Button className="btn btn-default" onClick={this.props.pauseButton}>
                         Pause
                     </Button>
+                    <Button className="btn btn-default" onClick={this.props.clear}>
+                        Clear
+                    </Button>
+                    <Button className="btn btn-default" onClick={this.props.slow}>
+                        Slow
+                    </Button>
+                    <Button className="btn btn-default" onClick={this.props.fast}>
+                        Fast
+                    </Button>
+                    <Button className="btn btn-default" onClick={this.props.seed}>
+                        Seed
+                    </Button>
+                    <DropdownButton id="size-menu" title="Grid Size" onSelect={this.handleSelect}>
+                    <Dropdown.Item eventKey="1">20X10</Dropdown.Item>
+                    <Dropdown.Item eventKey="2">50X30</Dropdown.Item>
+                    <Dropdown.Item eventKey="3">70X50</Dropdown.Item>
+                    </DropdownButton>
+
                 </ButtonGroup>
 
             </div>
@@ -187,6 +208,11 @@ class Main extends React.Component {
                 <Buttons
                     playButton={this.playButton}
                     pauseButton={this.pauseButton}
+                    clear={this.clear}
+                    slow={this.slow}
+                    fast={this.fast}
+                    seed={this.seed}
+                    gridSize={this.gridSize}
                 />    
                 <Grid
                   gridFull={this.state.gridFull}
@@ -201,7 +227,7 @@ class Main extends React.Component {
 }
 
 function arrayClone(arr) {
-    return JSON.parse(JSON.stringify(arr))
+    return JSON.parse(JSON.stringify(arr));
 }
 
 export default Main;
